@@ -1,14 +1,17 @@
 package com.praveen.ecommerce.models;
 
+import java.util.List;
+
 public class Variant {
 
 	public enum VariantType {
-		COLOUR, SIZE
+		COLOR, SIZE
 	}
 
+	private long id;
 	private VariantType variantType;
 	private String variantName;
-	private String imageLink;
+	private List<String> imageLink;
 
 	public VariantType getVariantType() {
 		return variantType;
@@ -26,12 +29,20 @@ public class Variant {
 		this.variantName = variantName;
 	}
 
-	public String getImageLink() {
+	public List<String> getImageLink() {
 		return imageLink;
 	}
 
-	public void setImageLink(String imageLink) {
+	public void setImageLink(List<String> imageLink) {
 		this.imageLink = imageLink;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 }

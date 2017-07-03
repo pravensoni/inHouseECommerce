@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Product {
 
-	private int id;
+	private Long id;
 	private String title;
 	private double price;
 	private double OrigPrice;
@@ -13,12 +13,7 @@ public class Product {
 	List<Variant> variants;
 	
 	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -54,6 +49,12 @@ public class Product {
 	}
 	public void setVariants(List<Variant> variants) {
 		this.variants = variants;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	
