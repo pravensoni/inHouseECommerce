@@ -9,6 +9,15 @@ public class Order {
 	List<Product> product;
 	CustomerDetail customerDetail;
 	OrderStatus orderStatus;
+	PaymentType paymentType;
+	PaymentStatus paymentStatus;
+	
+	public enum PaymentType{
+		ONLINE,COD
+	}
+	public enum PaymentStatus{
+		PENDING,IN_PROCESS,COMPLETED
+	}
 
 	public int getId() {
 		return id;
@@ -50,4 +59,21 @@ public class Order {
 		this.orderStatus = orderStatus;
 	}
 
+	public PaymentType getPaymentType() {
+		return paymentType;
+	}
+
+	public void setPaymentType(PaymentType paymentType) {
+		this.paymentType = paymentType;
+	}
+
+	public PaymentStatus getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(PaymentStatus paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+
+	
 }
