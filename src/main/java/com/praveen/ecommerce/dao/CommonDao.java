@@ -169,7 +169,7 @@ public class CommonDao {
 		return paymentId;
 	}
 
-	public List<Product> getHomePageProducts() {
+	public List<Product> getHomePageProducts(int siteId) {
 		return jdbcTemplate
 				.query("select h.*,p.*,(select link from images where id=p.id limit 1) as image_link from homepage_products h "
 						+ "left join product_detail p on h.product_id = p.id", getProductRM());
