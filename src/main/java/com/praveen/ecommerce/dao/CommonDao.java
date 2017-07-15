@@ -48,7 +48,8 @@ public class CommonDao {
 		Map<Long, Variant> variantMap = new HashMap<>();
 		jdbcTemplate.query(
 				"SELECT p.*,v.*,i.* FROM product_detail p " + "left join variants v on p.id = v.product_id "
-						+ "left join images i on i.variant_id=v.id where p.id=?",
+						+ "left join images i on ((i.variant_id=v.id and i.product_id=p.id) OR (i.variant_id is null and i.product_id=p.id)) "
+						+ "where p.id=?",
 				new Object[] { productId }, new RowMapper<Product>() {
 
 					@Override
@@ -62,18 +63,23 @@ public class CommonDao {
 							product.setTitle(rs.getString("p.title"));
 							product.setImageLinks(new ArrayList<String>());
 						}
-						if (rs.getLong("v.id") == 0)
+						if (rs.getLong("v.id") == 0){
+							product.getImageLinks().add(rs.getString("i.link"));
 							return null;
+						}
 						Variant variant = variantMap.get(rs.getLong("v.id"));
 						if (variant == null) {
 							variant = new Variant();
 							variant.setId(rs.getLong("v.id"));
 							variant.setImageLink(new ArrayList<String>());
+							if(rs.getString("i.link")!=null){
 							variant.getImageLink().add(rs.getString("i.link"));
+							product.getImageLinks().add(rs.getString("i.link"));
+							}
 							variant.setVariantName(rs.getString("variant"));
 							variant.setVariantType(VariantType.valueOf(rs.getString("variant_type")));
 							variantMap.put(rs.getLong("v.id"), variant);
-						} else {
+						} else if(rs.getString("i.link")!=null){
 							variant.getImageLink().add(rs.getString("i.link"));
 							product.getImageLinks().add(rs.getString("i.link"));
 						}
