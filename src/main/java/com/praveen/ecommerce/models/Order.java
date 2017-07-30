@@ -5,18 +5,29 @@ import java.util.List;
 public class Order {
 
 	private int id;
-	private String Disp_order_id;
-	List<Product> product;
-	CustomerDetail customerDetail;
-	OrderStatus orderStatus;
-	PaymentType paymentType;
-	PaymentStatus paymentStatus;
-	
-	public enum PaymentType{
-		ONLINE,COD
+	private String dispOrderId;
+	private List<Product> products;
+	private CustomerInfo customerInfo;
+	private OrderStatus orderStatus;
+	private PaymentType paymentType;
+	private PaymentStatus paymentStatus;
+	private int subTotal;
+	private PayInfo payInfo;
+
+	public PayInfo getPayInfo() {
+		return payInfo;
 	}
-	public enum PaymentStatus{
-		PENDING,IN_PROCESS,COMPLETED
+
+	public void setPayInfo(PayInfo payInfo) {
+		this.payInfo = payInfo;
+	}
+
+	public enum PaymentType {
+		ONLINE, COD
+	}
+
+	public enum PaymentStatus {
+		PENDING, IN_PROCESS, COMPLETED
 	}
 
 	public int getId() {
@@ -27,28 +38,12 @@ public class Order {
 		this.id = id;
 	}
 
-	public String getDisp_order_id() {
-		return Disp_order_id;
+	public List<Product> getProducts() {
+		return products;
 	}
 
-	public void setDisp_order_id(String disp_order_id) {
-		Disp_order_id = disp_order_id;
-	}
-
-	public List<Product> getProduct() {
-		return product;
-	}
-
-	public void setProduct(List<Product> product) {
-		this.product = product;
-	}
-
-	public CustomerDetail getCustomerDetail() {
-		return customerDetail;
-	}
-
-	public void setCustomerDetail(CustomerDetail customerDetail) {
-		this.customerDetail = customerDetail;
+	public void setProducts(List<Product> product) {
+		this.products = product;
 	}
 
 	public OrderStatus getOrderStatus() {
@@ -75,5 +70,37 @@ public class Order {
 		this.paymentStatus = paymentStatus;
 	}
 
+	public CustomerInfo getCustomerInfo() {
+		return customerInfo;
+	}
+
+	public void setCustomerInfo(CustomerInfo customerInfo) {
+		this.customerInfo = customerInfo;
+	}
+
+	public int getSubTotal() {
+		return subTotal;
+	}
+
+	public void setSubTotal(int subTotal) {
+		this.subTotal = subTotal;
+	}
+
+	public String getDispOrderId() {
+		return dispOrderId;
+	}
+
+	public void setDispOrderId(String dispOrderId) {
+		this.dispOrderId = dispOrderId;
+	}
+
+	@Override
+	public String toString() {
+		return "Order [id=" + id + ", dispOrderId=" + dispOrderId + ", products=" + products + ", customerInfo="
+				+ customerInfo + ", orderStatus=" + orderStatus + ", paymentType=" + paymentType + ", paymentStatus="
+				+ paymentStatus + ", subTotal=" + subTotal + ", payInfo=" + payInfo + "]";
+	}
 	
+	
+
 }

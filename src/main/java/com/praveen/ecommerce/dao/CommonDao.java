@@ -20,10 +20,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mysql.cj.api.jdbc.Statement;
-import com.praveen.ecommerce.models.CustomerDetail;
+import com.praveen.ecommerce.JavaIntegrationKit;
+import com.praveen.ecommerce.models.CustomerInfo;
+import com.praveen.ecommerce.models.Order;
 import com.praveen.ecommerce.models.Order.PaymentStatus;
 import com.praveen.ecommerce.models.Order.PaymentType;
 import com.praveen.ecommerce.models.OrderStatus.OrderStatusEnum;
+import com.praveen.ecommerce.models.PayInfo;
 import com.praveen.ecommerce.models.Product;
 import com.praveen.ecommerce.models.Variant;
 import com.praveen.ecommerce.models.Variant.VariantType;
@@ -33,6 +36,11 @@ public class CommonDao {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	JavaIntegrationKit kit;
+
+	public static Map<String, Order> orderCache = new HashMap<>();
 
 	/*
 	 * public Product getProduct(int productId) { try { return
@@ -46,11 +54,9 @@ public class CommonDao {
 
 		Product product = new Product();
 		Map<Long, Variant> variantMap = new HashMap<>();
-		jdbcTemplate.query(
-				"SELECT p.*,v.*,i.* FROM product_detail p " + "left join variants v on p.id = v.product_id "
-						+ "left join images i on ((i.variant_id=v.id and i.product_id=p.id) OR (i.variant_id is null and i.product_id=p.id)) "
-						+ "where p.id=?",
-				new Object[] { productId }, new RowMapper<Product>() {
+		jdbcTemplate.query("SELECT p.*,v.*,i.* FROM product_detail p " + "left join variants v on p.id = v.product_id "
+				+ "left join images i on ((i.variant_id=v.id and i.product_id=p.id) OR (i.variant_id is null and i.product_id=p.id)) "
+				+ "where p.id=?", new Object[] { productId }, new RowMapper<Product>() {
 
 					@Override
 					public Product mapRow(ResultSet rs, int i) throws SQLException, DataAccessException {
@@ -63,7 +69,7 @@ public class CommonDao {
 							product.setTitle(rs.getString("p.title"));
 							product.setImageLinks(new ArrayList<String>());
 						}
-						if (rs.getLong("v.id") == 0){
+						if (rs.getLong("v.id") == 0) {
 							product.getImageLinks().add(rs.getString("i.link"));
 							return null;
 						}
@@ -72,14 +78,14 @@ public class CommonDao {
 							variant = new Variant();
 							variant.setId(rs.getLong("v.id"));
 							variant.setImageLink(new ArrayList<String>());
-							if(rs.getString("i.link")!=null){
-							variant.getImageLink().add(rs.getString("i.link"));
-							product.getImageLinks().add(rs.getString("i.link"));
+							if (rs.getString("i.link") != null) {
+								variant.getImageLink().add(rs.getString("i.link"));
+								product.getImageLinks().add(rs.getString("i.link"));
 							}
 							variant.setVariantName(rs.getString("variant"));
 							variant.setVariantType(VariantType.valueOf(rs.getString("variant_type")));
 							variantMap.put(rs.getLong("v.id"), variant);
-						} else if(rs.getString("i.link")!=null){
+						} else if (rs.getString("i.link") != null) {
 							variant.getImageLink().add(rs.getString("i.link"));
 							product.getImageLinks().add(rs.getString("i.link"));
 						}
@@ -106,11 +112,11 @@ public class CommonDao {
 	 */
 
 	@Transactional(rollbackFor = Exception.class)
-	public Long placeOrder(CustomerDetail cd, long productId, long variantId, PaymentType pt) {
+	public Order placeOrder(Order order) {
 		KeyHolder holder = new GeneratedKeyHolder();
 		Long orderId = null;
-		Long customerId = insertCustomerDetail(cd);
-		Long paymentId = insertPaymentDetail(pt, PaymentStatus.PENDING);
+		Long customerId = insertCustomerDetail(order.getCustomerInfo());
+		Long paymentId = insertPaymentDetail(order.getPaymentType(), PaymentStatus.PENDING);
 		int i = jdbcTemplate.update(new PreparedStatementCreator() {
 
 			@Override
@@ -127,10 +133,89 @@ public class CommonDao {
 		if (i == 1) {
 			orderId = holder.getKey().longValue();
 		}
-		return orderId;
+
+		for (Product product : order.getProducts()) {
+			if (product.getVariants() != null && !product.getVariants().isEmpty())
+				for (Variant var : product.getVariants()) {
+					insertOrderProductMapping(orderId, product.getId(), var.getId(), var.getQty());
+				}
+			else {
+				insertOrderProductMapping(orderId, product.getId(), null, product.getQty());
+			}
+		}
+
+		order.setId(orderId.intValue());
+		order.setDispOrderId(updateDispOrderId(orderId, "FC"));
+		setPayInfo(order);
+		sendEmail(order.getCustomerInfo().getEmail());
+
+		orderCache.put(order.getDispOrderId(), order);
+
+		return order;
 	}
 
-	public Long insertCustomerDetail(CustomerDetail cd) {
+	private void setPayInfo(Order order) {
+		PayInfo payInfo = new PayInfo("UFu3ed", "", order.getDispOrderId(), order.getSubTotal() + "",
+				order.getCustomerInfo().getFname(), order.getCustomerInfo().getEmail(),
+				order.getCustomerInfo().getPhone(), "testProductInfo", "http://localhost:8080/payment/success",
+				"http://localhost:8080/payment/failure", "payu_paisa");
+		Map<String, String> params = new HashMap<>();
+		params.put("key", payInfo.getKey());
+		params.put("txnid", payInfo.getTxnid());
+		params.put("amount", payInfo.getAmount());
+		params.put("firstname", payInfo.getFirstname());
+		params.put("email", payInfo.getEmail());
+		params.put("phone", payInfo.getPhone());
+		params.put("productinfo",payInfo.getProductinfo());
+		params.put("surl", payInfo.getSurl());
+		params.put("furl", payInfo.getFurl());
+		params.put("service_provider", payInfo.getServiceProvider());
+		String hash = null;
+		try {
+			hash = kit.hashCalMethod(params).get("hash");
+			payInfo.setHash(hash);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		order.setPayInfo(payInfo);
+	}
+
+	public boolean sendEmail(String add) {
+		// TODO : implement
+		return true;
+	}
+
+	private String updateDispOrderId(Long orderId, String prefix) {
+		String dispOrderId = prefix + orderId;
+		int i = jdbcTemplate.update("UPDATE order_details SET disp_order_id = ? WHERE id=?",
+				new Object[] { dispOrderId, orderId });
+		if (i > 0) {
+			return dispOrderId;
+		} else {
+			return null;
+		}
+
+	}
+
+	private void insertOrderProductMapping(Long orderId, Long productId, Long variantId, int qty) {
+		jdbcTemplate.update(new PreparedStatementCreator() {
+
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				String sql = "INSERT INTO product_order (order_id, product_id, variant_id,qty)  VALUES (?,?,?,?)";
+				PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				ps.setLong(1, orderId);
+				ps.setLong(2, productId);
+				ps.setLong(3, variantId);
+				ps.setInt(4, qty);
+
+				return ps;
+			}
+		});
+
+	}
+
+	public Long insertCustomerDetail(CustomerInfo cd) {
 		KeyHolder holder = new GeneratedKeyHolder();
 		Long custumerId = null;
 		int i = jdbcTemplate.update(new PreparedStatementCreator() {
@@ -141,8 +226,8 @@ public class CommonDao {
 				PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, cd.getEmail());
 				ps.setString(2, cd.getPhone());
-				ps.setString(3, cd.getFirstName());
-				ps.setString(4, cd.getLastName());
+				ps.setString(3, cd.getFname());
+				ps.setString(4, cd.getLname());
 				ps.setString(5, cd.getAddress());
 				ps.setString(6, cd.getCity());
 				ps.setString(7, cd.getPincode());
@@ -162,7 +247,7 @@ public class CommonDao {
 
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-				String sql = "INSERT INTO payments (payment_type, payment_status)  VALUES (?,?,?)";
+				String sql = "INSERT INTO payments (payment_type, payment_status)  VALUES (?,?)";
 				PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, pt.name());
 				ps.setString(2, pst.name());
@@ -202,6 +287,14 @@ public class CommonDao {
 		int i = jdbcTemplate.update("UPDATE order_details o left join payments py on o.payment_id = py.id "
 				+ "SET payment_status = ? WHERE o.id=?", new Object[] { ps.name(), orderId });
 		return i == 1;
+	}
+
+	public Order getOrder(String dispOrderId) {
+		Order order = orderCache.get(dispOrderId);
+		if (order == null) {
+			// TODO : get order from db
+		}
+		return order;
 	}
 
 }

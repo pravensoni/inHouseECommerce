@@ -1,12 +1,12 @@
 package com.praveen.ecommerce.models;
 
-public class CustomerDetail {
+public class CustomerInfo {
 
 	private String id;
 	private String email;
 	private String phone;
-	private String firstName;
-	private String lastName;
+	private String fname;
+	private String lname;
 	private String address;
 	private String city;
 	private String state;
@@ -36,20 +36,20 @@ public class CustomerDetail {
 		this.phone = phone;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFname() {
+		return fname;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setFname(String fname) {
+		this.fname = fname;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getLname() {
+		return lname;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setLname(String lname) {
+		this.lname = lname;
 	}
 
 	public String getAddress() {
@@ -83,5 +83,13 @@ public class CustomerDetail {
 	public void setPincode(String pincode) {
 		this.pincode = pincode;
 	}
+
+	@Override
+	public String toString() {
+		return "CustomerInfo [id=" + id + ", email=" + email + ", phone=" + phone + ", fname=" + fname + ", lname="
+				+ lname + ", address=" + address + ", city=" + city + ", state=" + state + ", pincode=" + pincode + "]";
+	}
+	
+	
 
 }

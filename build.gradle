@@ -15,6 +15,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'application'
+apply plugin: 'war'
 
 mainClassName = "com.praveen.ecommerce.InHouseECommerceApplication"
 
@@ -32,6 +33,7 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.0.pr4'
+	compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '1.5.4.RELEASE'
 	
 }
 

@@ -12,6 +12,7 @@ public class Variant {
 	private VariantType variantType;
 	private String variantName;
 	private List<String> imageLink;
+	private int qty;
 
 	public VariantType getVariantType() {
 		return variantType;
@@ -44,5 +45,21 @@ public class Variant {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+	public int getQty() {
+		return qty;
+	}
+
+	public void setQty(int qty) {
+		this.qty = qty;
+	}
+
+	@Override
+	public String toString() {
+		return "Variant [id=" + id + ", variantType=" + variantType + ", variantName=" + variantName + ", imageLink="
+				+ imageLink + ", qty=" + qty + "]";
+	}
+	
+	
 
 }

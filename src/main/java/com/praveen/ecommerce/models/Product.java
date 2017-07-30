@@ -11,6 +11,7 @@ public class Product {
 	private String description;
 	List<String> imageLinks;
 	List<Variant> variants;
+	private int qty;
 	
 	
 
@@ -55,6 +56,18 @@ public class Product {
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public int getQty() {
+		return qty;
+	}
+	public void setQty(int qty) {
+		this.qty = qty;
+	}
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", title=" + title + ", price=" + price + ", OrigPrice=" + OrigPrice
+				+ ", description=" + description + ", imageLinks=" + imageLinks + ", variants=" + variants + ", qty="
+				+ qty + "]";
 	}
 	
 	
