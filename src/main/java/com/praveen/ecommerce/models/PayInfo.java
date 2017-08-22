@@ -1,7 +1,12 @@
 package com.praveen.ecommerce.models;
 
 public class PayInfo {
-	private String key;
+
+	private static String key = "XUvj0LgD";
+	private static String serviceProvider = "payu_paisa";
+	private static String surl = "http://test.fidgetcube.in/webs/payment/success";
+	private static String furl = "http://test.fidgetcube.in/webs/payment/failure";
+
 	private String hash;
 	private String txnid;
 	private String amount;
@@ -9,16 +14,11 @@ public class PayInfo {
 	private String email;
 	private String phone;
 	private String productinfo;
-	private String surl;
-	private String furl;
-	private String serviceProvider;
-	
 
 
-	public PayInfo(String key, String hash, String txnid, String amount, String firstname, String email, String phone,
-			String productinfo, String surl, String furl, String serviceProvider) {
+	public PayInfo(String hash, String txnid, String amount, String firstname, String email, String phone,
+			String productinfo) {
 		super();
-		this.key = key;
 		this.hash = hash;
 		this.txnid = txnid;
 		this.amount = amount;
@@ -26,17 +26,14 @@ public class PayInfo {
 		this.email = email;
 		this.phone = phone;
 		this.productinfo = productinfo;
-		this.surl = surl;
-		this.furl = furl;
-		this.serviceProvider = serviceProvider;
 	}
 
 	public String getKey() {
 		return key;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public String getServiceProvider() {
+		return serviceProvider;
 	}
 
 	public String getHash() {
@@ -99,25 +96,10 @@ public class PayInfo {
 		return surl;
 	}
 
-	public void setSurl(String surl) {
-		this.surl = surl;
-	}
-
 	public String getFurl() {
 		return furl;
 	}
 
-	public void setFurl(String furl) {
-		this.furl = furl;
-	}
-
-	public String getServiceProvider() {
-		return serviceProvider;
-	}
-
-	public void setServiceProvider(String serviceProvider) {
-		this.serviceProvider = serviceProvider;
-	}
 
 	@Override
 	public String toString() {
@@ -125,7 +107,5 @@ public class PayInfo {
 				+ firstname + ", email=" + email + ", phone=" + phone + ", productinIo=" + productinfo + ", surl="
 				+ surl + ", furl=" + furl + ", serviceProvider=" + serviceProvider + "]";
 	}
-	
-	
 
 }

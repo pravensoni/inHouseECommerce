@@ -1,6 +1,6 @@
 package com.praveen.ecommerce.models;
 
-public class CustomerInfo {
+public class CustomerInfo extends UserInfo{
 
 	private String id;
 	private String email;

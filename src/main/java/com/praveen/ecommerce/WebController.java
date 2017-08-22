@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.praveen.ecommerce.dao.CommonDao;
+import com.praveen.ecommerce.dao.OrderDao;
+import com.praveen.ecommerce.dao.PaymentDao;
+import com.praveen.ecommerce.dao.ProductDao;
 import com.praveen.ecommerce.models.Order;
+import com.praveen.ecommerce.utils.SendMail;
 
 @RestController
 public class WebController {
@@ -24,20 +28,29 @@ public class WebController {
 	CommonDao commonDao;
 
 	@Autowired
-	JavaIntegrationKit kit;
+	ProductDao productDao;
+
+	@Autowired
+	SendMail sendMail;
+
+	@Autowired
+	PaymentDao paymentDao;
+
+	@Autowired
+	OrderDao orderDao;
 
 	@CrossOrigin
 	@RequestMapping("/product/{productId}")
 	public String getProductDetail(@PathVariable("productId") int productId) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(commonDao.getProduct(productId));
+		return mapper.writeValueAsString(productDao.getProduct(productId));
 	}
 
 	@CrossOrigin
 	@RequestMapping("product/homepage/{siteId}")
 	public String getHomePageProducts(@PathVariable("siteId") int siteId) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(commonDao.getHomePageProducts(siteId));
+		return mapper.writeValueAsString(productDao.getHomePageProducts(siteId));
 	}
 
 	@CrossOrigin
@@ -45,7 +58,7 @@ public class WebController {
 	public ResponseEntity<String> persistPerson(@RequestBody Order order) throws Exception {
 		if (true) {
 			System.out.println(order.toString());
-			Order resOrder = commonDao.placeOrder(order);
+			Order resOrder = orderDao.placeOrder(order);
 			ObjectMapper mapper = new ObjectMapper();
 			String resJson = mapper.writeValueAsString(resOrder);
 			return new ResponseEntity<String>(resJson, HttpStatus.CREATED);
@@ -57,15 +70,30 @@ public class WebController {
 	@RequestMapping("order/{dispOrderId}")
 	public String getorderDetails(@PathVariable("dispOrderId") String dispOrderId) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(commonDao.getOrder(dispOrderId));
+		return mapper.writeValueAsString(orderDao.getOrder(dispOrderId));
 	}
 
 	@CrossOrigin
 	@RequestMapping("/payment/{status}")
-	public String gethash(@RequestParam Map<String, String> params,@PathVariable("status") String status) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
+	public String updatePayment(@RequestParam Map<String, String> params, @PathVariable("status") String status)
+			throws Exception {
 		System.out.println(params.toString());
-		return mapper.writeValueAsString("");
+		return paymentDao.processPayment(params);
+	}
+
+	@CrossOrigin
+	@RequestMapping("/mail")
+	public String updatePaymentTest(@RequestParam Map<String, String> params) {
+		String body = "Name: " + params.get("name") + "<br> Email: " + params.get("email") + "<br> phone: "
+				+ params.get("phone") + "<br> message: " + params.get("message");
+		sendMail.sendEmail("psoni10001@gmail.com", params.get("email"), "contact Form", body);
+		return "";
+	}
+
+	@CrossOrigin
+	@RequestMapping("/order/status")
+	public String getOrderStatus(@RequestParam Map<String, String> params) {
+		return orderDao.getOrderStatus(params.get("dispOrderId"));
 	}
 
 }

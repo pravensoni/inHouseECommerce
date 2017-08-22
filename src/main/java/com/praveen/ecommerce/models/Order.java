@@ -1,5 +1,6 @@
 package com.praveen.ecommerce.models;
 
+import java.util.Date;
 import java.util.List;
 
 public class Order {
@@ -10,9 +11,12 @@ public class Order {
 	private CustomerInfo customerInfo;
 	private OrderStatus orderStatus;
 	private PaymentType paymentType;
-	private PaymentStatus paymentStatus;
+	private String paymentStatus;
 	private int subTotal;
+	private int shipping;
+	private int total;
 	private PayInfo payInfo;
+	private Date date;
 
 	public PayInfo getPayInfo() {
 		return payInfo;
@@ -26,9 +30,7 @@ public class Order {
 		ONLINE, COD
 	}
 
-	public enum PaymentStatus {
-		PENDING, IN_PROCESS, COMPLETED
-	}
+
 
 	public int getId() {
 		return id;
@@ -62,11 +64,11 @@ public class Order {
 		this.paymentType = paymentType;
 	}
 
-	public PaymentStatus getPaymentStatus() {
+	public String getPaymentStatus() {
 		return paymentStatus;
 	}
 
-	public void setPaymentStatus(PaymentStatus paymentStatus) {
+	public void setPaymentStatus(String paymentStatus) {
 		this.paymentStatus = paymentStatus;
 	}
 
@@ -94,12 +96,37 @@ public class Order {
 		this.dispOrderId = dispOrderId;
 	}
 
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public int getShipping() {
+		return shipping;
+	}
+
+	public void setShipping(int shipping) {
+		this.shipping = shipping;
+	}
+
+	public int getTotal() {
+		return total;
+	}
+
+	public void setTotal(int total) {
+		this.total = total;
+	}
+
 	@Override
 	public String toString() {
 		return "Order [id=" + id + ", dispOrderId=" + dispOrderId + ", products=" + products + ", customerInfo="
 				+ customerInfo + ", orderStatus=" + orderStatus + ", paymentType=" + paymentType + ", paymentStatus="
-				+ paymentStatus + ", subTotal=" + subTotal + ", payInfo=" + payInfo + "]";
+				+ paymentStatus + ", subTotal=" + subTotal + ", payInfo=" + payInfo + ", date=" + date + "]";
 	}
+	
 	
 	
 
