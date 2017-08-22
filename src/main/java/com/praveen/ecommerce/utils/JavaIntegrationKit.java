@@ -1,4 +1,4 @@
-package com.praveen.ecommerce;
+package com.praveen.ecommerce.utils;
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -63,9 +63,9 @@ public class JavaIntegrationKit {
 	}
 
 	public Map<String, String> hashCalMethod(Map<String, String> params) throws ServletException, IOException {
-		String salt = "fE0aTrjr";
+		String salt = "****";
 		String action1 = "";
-		String base_url = "https://test.payu.in";
+		String base_url = "https://secure.payu.in";
 		error = 0;
 		String hashString = "";
 		Map<String, String> urlParams = new HashMap<String, String>();
